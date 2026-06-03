@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktek PSAT Informatika</title>
+    <style>
+        /* Palet Warna */
+        :root {
+            --primary-blue: #1b365d;
+            --light-blue: #e0f0ff;
+            --accent-yellow: #ffcc00;
+            --text-dark: #333;
+            --bg-gray: #f4f7f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-blue);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            color: var(--accent-yellow);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            text-align: center;
+            padding: 15px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 2px solid var(--primary-blue);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Area Game Utama */
+        .game-container {
+            background-color: var(--light-blue);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #b3d4f0;
+            margin-bottom: 30px;
+        }
+
+        /* Area Gambar Utama (Hook) */
+        .hook-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #9cbddb;
+        }
+
+        .hook-section img {
+            max-width: 100%;
+            height: auto;
+            max-height: 350px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            border: 4px solid var(--primary-blue);
+            background-color: white;
+            padding: 5px;
+        }
+
+        .hook-title {
+            margin-top: 15px;
+            color: var(--primary-blue);
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Area Gambar dan Dropzone (Komponen) */
+        .game-board {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .item-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .item-card img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .dropzone {
+            width: 100%;
+            min-height: 50px;
+            border: 2px dashed #999;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .dropzone.hover {
+            background-color: #e8f4f8;
+            border-color: var(--primary-blue);
+            transform: scale(1.05);
+        }
+
+        /* Area Pilihan Jawaban (Drag) */
+        .choices-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            padding: 25px;
+            background-color: white;
+            border-radius: 10px;
+            min-height: 100px;
+            border: 2px solid var(--primary-blue);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .draggable {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: grab;
+            font-weight: bold;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .draggable:hover {
+            background-color: #2a4e82;
+        }
+
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        /* Tombol Aksi */
+        .actions {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 12px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            background-color: var(--accent-yellow);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: #e6b800;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-reset {
+            background-color: #e0e0e0;
+            color: #555;
+            margin-left: 15px;
+        }
+
+        .btn-reset:hover {
+            background-color: #d0d0d0;
+        }
+
+        /* Status Benar/Salah */
+        .correct {
+            border-color: #2ecc71 !important;
+            background-color: #d5f5e3 !important;
+        }
+
+        .incorrect {
+            border-color: #e74c3c !important;
+            background-color: #fadbd8 !important;
+        }
+
+        footer {
+            background-color: var(--primary-blue);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>PRAKTEK PSAT INFORMATIKA</h1>
+        <p>Amati gambar utama, lalu cocokkan nama komponen di bawahnya!</p>
+    </header>
+
+    <div class="controls">
+        <label for="quiz-select"><strong>Pilih Kategori Soal:</strong> </label>
+        <select id="quiz-select" onchange="loadQuiz()">
+            <option value="hardware">1. Perangkat Keras (Hardware)</option>
+            <option value="cpu">2. Komponen CPU</option>
+            <option value="office">3. Microsoft Office</option>
+        </select>
+    </div>
+
+    <main>
+        <div class="game-container">
+            <div class="hook-section">
+                <img id="hook-img" src="" alt="Gambar Utama (Hook)">
+                <div class="hook-title" id="hook-text">Judul Hook</div>
+            </div>
+
+            <div class="game-board" id="board">
+                </div>
+        </div>
+
+        <h3 style="text-align: center; margin-bottom: 15px; color: var(--primary-blue);">Pilihan Jawaban (Tarik ke kotak kosong)</h3>
+        
+        <div class="choices-area" id="choices" ondragover="allowDrop(event)" ondrop="dropToChoices(event)">
+            </div>
+
+        <div class="actions">
+            <button onclick="checkAnswers()">Submit Jawaban</button>
+            <button class="btn-reset" onclick="loadQuiz()">Reset</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Copyright by Ferizqo</p>
+    </footer>
+
+    <script>
+        // Data Soal, Hook, dan Gambar Komponen
+        const quizData = {
+            hardware: {
+                title: "Kesatuan Perangkat Keras Komputer",
+                hookImage: 'Hook_hardware.png', // <--- Nama file gambar tengah untuk soal 1
+                items: [
+                    { id: 'h1', image: 'monitor.png', answer: 'Monitor' },
+                    { id: 'h2', image: 'cpu_unit.png', answer: 'CPU' },
+                    { id: 'h3', image: 'cddvd.png', answer: 'CD/DVD Drive' },
+                    { id: 'h4', image: 'diskdrive.png', answer: 'Disk Drive' },
+                    { id: 'h5', image: 'speaker.png', answer: 'Speaker' },
+                    { id: 'h6', image: 'keyboard.png', answer: 'Keyboard' },
+                    { id: 'h7', image: 'mouse.png', answer: 'Mouse' }
+                ]
+            },
+            cpu: {
+                title: "Bagian Dalam Casing CPU",
+                hookImage: 'Hook_cpu.png', // <--- Nama file gambar tengah untuk soal 2 (Dari potongan gambar)
+                items: [
+                    { id: 'c1', image: 'power_suply.png', answer: 'Power Supply' },
+                    { id: 'c2', image: 'motherboard.png', answer: 'Motherboard' },
+                    { id: 'c3', image: 'processor.png', answer: 'Prosesor (CPU)' },
+                    { id: 'c4', image: 'ram.png', answer: 'RAM (Memory)' },
+                    { id: 'c5', image: 'heatsink.png', answer: 'Heat Sink' },
+                    { id: 'c6', image: 'harddrive.png', answer: 'Hard Drive' },
+                    { id: 'c7', image: 'optikal.png', answer: 'Optical Drive' },
+                    { id: 'c8', image: 'cool.png', answer: 'Cooling Fan' }
+                ]
+            },
+            office: {
+                title: "Kumpulan Aplikasi Microsoft Office",
+                hookImage: 'Hook_office.png', // <--- Nama file gambar tengah untuk soal 3
+                items: [
+                    { id: 'o1', image: 'excel.png', answer: 'Excel' },
+                    { id: 'o2', image: 'onenote.png', answer: 'OneNote' },
+                    { id: 'o3', image: 'outlok.png', answer: 'Outlook' },
+                    { id: 'o4', image: 'word.png', answer: 'Word' },
+                    { id: 'o5', image: 'powerpoint.png', answer: 'PowerPoint' },
+                    { id: 'o6', image: 'access.png', answer: 'Access' },
+                    { id: 'o7', image: 'publisher.png', answer: 'Publisher' },
+                    { id: 'o8', image: 'lync.png', answer: 'Lync' }
+                ]
+            }
+        };
+
+        // Fungsi untuk mengacak urutan array jawaban
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Fungsi utama memuat soal ke layar
+        function loadQuiz() {
+            const select = document.getElementById('quiz-select');
+            const category = select.value;
+            const currentQuiz = quizData[category];
+
+            // Set Gambar Hook (Tengah) dan Judulnya
+            const hookImgEl = document.getElementById('hook-img');
+            hookImgEl.src = currentQuiz.hookImage;
+            // Jika gambar hook belum ada di folder, gunakan placeholder informatif
+            hookImgEl.onerror = function() {
+                this.src = `https://via.placeholder.com/600x300/1b365d/ffcc00?text=Siapkan+Gambar:+${currentQuiz.hookImage}`;
+            };
+            document.getElementById('hook-text').textContent = currentQuiz.title;
+
+            const board = document.getElementById('board');
+            const choices = document.getElementById('choices');
+            
+            board.innerHTML = '';
+            choices.innerHTML = '';
+
+            let answers = [];
+
+            // Render Kartu Komponen
+            currentQuiz.items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                
+                // Gunakan gambar placeholder jika gambar komponen belum ada
+                card.innerHTML = `
+                    <img src="${item.image}" alt="${item.answer}" onerror="this.src='https://via.placeholder.com/120/e0f0ff/1b365d?text=${item.image}'">
+                    <div class="dropzone" data-answer="${item.answer}" ondragover="allowDrop(event)" ondrop="drop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
+                `;
+                board.appendChild(card);
+                answers.push(item.answer);
+            });
+
+            // Acak label jawaban dan tampilkan di kolom bawah
+            answers = shuffleArray(answers);
+            answers.forEach((ans, index) => {
+                const label = document.createElement('div');
+                label.className = 'draggable';
+                label.draggable = true;
+                label.id = 'drag-' + index;
+                label.textContent = ans;
+                label.ondragstart = drag;
+                choices.appendChild(label);
+            });
+        }
+
+        // --- Logika Drag & Drop ---
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function dragEnter(ev) {
+            ev.preventDefault();
+            if (ev.target.classList.contains('dropzone')) {
+                ev.target.classList.add('hover');
+            }
+        }
+
+        function dragLeave(ev) {
+            if (ev.target.classList.contains('dropzone')) {
+                ev.target.classList.remove('hover');
+            }
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            let target = ev.target;
+            
+            if (target.classList.contains('dropzone')) {
+                target.classList.remove('hover');
+                
+                // Jika sudah ada isinya, keluarkan isi lama kembali ke bawah
+                if(target.children.length > 0) {
+                    document.getElementById('choices').appendChild(target.children[0]);
+                }
+
+                // Masukkan elemen baru
+                const data = ev.dataTransfer.getData("text");
+                target.appendChild(document.getElementById(data));
+                
+                // Reset warna benar/salah jika digeser lagi
+                target.classList.remove('correct', 'incorrect');
+            }
+        }
+
+        function dropToChoices(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            // Kembalikan ke area pilihan jawaban
+            if (ev.target.id === 'choices' || ev.target.classList.contains('choices-area')) {
+                document.getElementById('choices').appendChild(document.getElementById(data));
+            }
+        }
+
+        // --- Pengecekan Jawaban ---
+        function checkAnswers() {
+            const dropzones = document.querySelectorAll('.dropzone');
+            let allCorrect = true;
+            let answeredCount = 0;
+
+            dropzones.forEach(zone => {
+                const correctAnswer = zone.getAttribute('data-answer');
+                zone.classList.remove('correct', 'incorrect');
+
+                if (zone.children.length > 0) {
+                    answeredCount++;
+                    const userAnswer = zone.children[0].textContent;
+                    if (userAnswer === correctAnswer) {
+                        zone.classList.add('correct');
+                    } else {
+                        zone.classList.add('incorrect');
+                        allCorrect = false;
+                    }
+                } else {
+                    allCorrect = false;
+                }
+            });
+
+            if (answeredCount === 0) {
+                alert("Silakan tarik pilihan jawaban ke dalam kotak di bawah gambar!");
+                return;
+            }
+
+            if (allCorrect && answeredCount === dropzones.length) {
+                alert("Luar Biasa! Semua jawaban Anda BENAR! 🎉");
+            } else if (answeredCount < dropzones.length) {
+                alert("Masih ada kotak yang kosong. Silakan lengkapi semuanya!");
+            } else {
+                alert("Ups, masih ada komponen yang keliru (warna merah). Yuk coba perbaiki!");
+            }
+        }
+
+        // Inisialisasi awal saat halaman dibuka
+        window.onload = loadQuiz;
+    </script>
+
+</body>
+</html>
